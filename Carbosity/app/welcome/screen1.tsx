@@ -1,5 +1,7 @@
-import { View, Text, Button, StyleSheet } from "react-native";
+import { View, Text, Button, StyleSheet, Switch } from "react-native";
 import { useRouter } from "expo-router";
+import { IconButton } from "react-native-paper";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function WelcomeScreen1() {
   const router = useRouter();
@@ -7,7 +9,7 @@ export default function WelcomeScreen1() {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Welcome to Screen 1!</Text>
-      <Button title="Next" onPress={() => router.push("/welcome/screen2")} />
+      <IconButton icon="arrow-right" onPress={() => router.push("/welcome/screen2")} />
     </View>
   );
 }

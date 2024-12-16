@@ -1,45 +1,143 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, StyleSheet, LogBox, Platform } from 'react-native';
+import { CommonActions } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { BottomNavigation } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import HomeScreen from '.';
+import ExploreScreen from './explore';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useTheme } from '@react-navigation/native';
+import * as NavigationBar from 'expo-navigation-bar';
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+const Tab = createBottomTabNavigator();
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+LogBox.ignoreLogs([
+  'A props object containing a "key" prop is being spread into JSX',
+]);
+
+export default function MyComponent() {
+  const { colors } = useTheme(); 
+  const tabBarColor = colors.card; 
+const bgColor = colors.background;
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      NavigationBar.setBackgroundColorAsync(tabBarColor); 
+      NavigationBar.setButtonStyleAsync('light');
+    }
+    return () => {
+      if (Platform.OS === 'android') {
+        NavigationBar.setBackgroundColorAsync(bgColor);
+        NavigationBar.setButtonStyleAsync('dark');
+      }
+    };
+  }, [tabBarColor]);
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
+    <SafeAreaProvider>
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: tabBarColor,
+            elevation: 0, 
+            borderTopWidth: 0,
             position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
           },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+        tabBar={({ navigation, state, descriptors, insets }) => (
+          <BottomNavigation.Bar
+            navigationState={state}
+            safeAreaInsets={insets}
+            style={{
+              backgroundColor: tabBarColor, 
+              elevation: 0, 
+              borderTopWidth: 0, 
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+            }}
+            onTabPress={({ route, preventDefault }) => {
+              const event = navigation.emit({
+                type: 'tabPress',
+                target: route.key,
+                canPreventDefault: true,
+              });
+
+              if (event.defaultPrevented) {
+                preventDefault();
+              } else {
+                navigation.dispatch({
+                  ...CommonActions.navigate(route.name, route.params),
+                  target: state.key,
+                });
+              }
+            }}
+            renderIcon={({ route, focused, color }) => {
+              const { options } = descriptors[route.key];
+              if (options.tabBarIcon) {
+                return options.tabBarIcon({ focused, color, size: 30 }); // Dynamic color and size
+              }
+              return null;
+            }}
+            getLabelText={({ route }) => {
+              const { options } = descriptors[route.key];
+              const label =
+                options.tabBarLabel !== undefined
+                  ? options.tabBarLabel
+                  : options.title !== undefined
+                  ? options.title
+                  : route.name;
+              return typeof label === 'string' ? label : undefined;
+            }}
+          />
+        )}
+      >
+        <Tab.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            tabBarLabel: 'Home',
+            tabBarIcon: ({ focused }) => {
+              return (
+                <MaterialCommunityIcons
+                  name="home"
+                  size={30}
+                  color={focused ? '#6200ee' : '#999'} 
+                />
+              );
+            },
+          }}
+        />
+        <Tab.Screen
+          name="Explore"
+          component={ExploreScreen}
+          options={{
+            tabBarLabel: 'Explore',
+            tabBarIcon: ({ focused }) => {
+              return (
+                <MaterialCommunityIcons
+                  name="magnify"
+                  size={30}
+                  color={focused ? '#03dac6' : '#999'}
+                />
+              );
+            },
+          }}
+        />
+      </Tab.Navigator>
+    </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
