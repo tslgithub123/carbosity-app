@@ -17,12 +17,12 @@ LogBox.ignoreLogs([
 ]);
 
 export default function MyComponent() {
-  const { colors } = useTheme(); 
-  const tabBarColor = colors.card; 
-const bgColor = colors.background;
+  const { colors } = useTheme();
+  const tabBarColor = colors.card;
+  const bgColor = colors.background;
   useEffect(() => {
     if (Platform.OS === 'android') {
-      NavigationBar.setBackgroundColorAsync(tabBarColor); 
+      NavigationBar.setBackgroundColorAsync(tabBarColor);
       NavigationBar.setButtonStyleAsync('light');
     }
     return () => {
@@ -40,7 +40,7 @@ const bgColor = colors.background;
           headerShown: false,
           tabBarStyle: {
             backgroundColor: tabBarColor,
-            elevation: 0, 
+            elevation: 0,
             borderTopWidth: 0,
             position: 'absolute',
             bottom: 0,
@@ -53,9 +53,9 @@ const bgColor = colors.background;
             navigationState={state}
             safeAreaInsets={insets}
             style={{
-              backgroundColor: tabBarColor, 
-              elevation: 0, 
-              borderTopWidth: 0, 
+              backgroundColor: bgColor,
+              elevation: 0,
+              borderTopWidth: 0,
               position: 'absolute',
               bottom: 0,
               left: 0,
@@ -80,7 +80,7 @@ const bgColor = colors.background;
             renderIcon={({ route, focused, color }) => {
               const { options } = descriptors[route.key];
               if (options.tabBarIcon) {
-                return options.tabBarIcon({ focused, color, size: 30 }); // Dynamic color and size
+                return options.tabBarIcon({ focused, color, size: 30 });
               }
               return null;
             }}
@@ -90,8 +90,8 @@ const bgColor = colors.background;
                 options.tabBarLabel !== undefined
                   ? options.tabBarLabel
                   : options.title !== undefined
-                  ? options.title
-                  : route.name;
+                    ? options.title
+                    : route.name;
               return typeof label === 'string' ? label : undefined;
             }}
           />
@@ -106,8 +106,8 @@ const bgColor = colors.background;
               return (
                 <MaterialCommunityIcons
                   name="home"
-                  size={30}
-                  color={focused ? '#6200ee' : '#999'} 
+                  size={24}
+                  color={focused ? '#6200ee' : '#999'}
                 />
               );
             },
@@ -122,7 +122,7 @@ const bgColor = colors.background;
               return (
                 <MaterialCommunityIcons
                   name="magnify"
-                  size={30}
+                  size={24}
                   color={focused ? '#03dac6' : '#999'}
                 />
               );
