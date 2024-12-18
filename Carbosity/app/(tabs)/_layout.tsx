@@ -9,6 +9,7 @@ import ExploreScreen from './explore';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTheme } from '@react-navigation/native';
 import * as NavigationBar from 'expo-navigation-bar';
+import ElectricityHome from '../electricity';
 
 const Tab = createBottomTabNavigator();
 
@@ -22,7 +23,7 @@ export default function MyComponent() {
   const bgColor = colors.background;
   useEffect(() => {
     if (Platform.OS === 'android') {
-      NavigationBar.setBackgroundColorAsync(tabBarColor);
+      NavigationBar.setBackgroundColorAsync(bgColor);
       NavigationBar.setButtonStyleAsync('light');
     }
     return () => {
@@ -113,7 +114,7 @@ export default function MyComponent() {
             },
           }}
         />
-        <Tab.Screen
+        {/* <Tab.Screen
           name="Explore"
           component={ExploreScreen}
           options={{
@@ -124,6 +125,23 @@ export default function MyComponent() {
                   name="magnify"
                   size={24}
                   color={focused ? '#03dac6' : '#999'}
+                />
+              );
+            },
+          }}
+        /> */}
+        <Tab.Screen
+          name="Electricity"
+          component={ElectricityHome}
+          options={{
+            headerShown: true,
+            tabBarLabel: 'Electricity',
+            tabBarIcon: ({ focused }) => {
+              return (
+                <MaterialCommunityIcons
+                  name="lightning-bolt"
+                  size={24}
+                  color={focused ? '#e5e536' : '#999'}
                 />
               );
             },
