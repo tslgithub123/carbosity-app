@@ -114,14 +114,7 @@ export default function MyComponent() {
           options={{
             headerShown: true,
             headerTintColor: theme.colors.primary,
-            headerBackground: () => (
-              <View
-                style={{
-                  backgroundColor: tabBarBackgroundColor,
-                  height: 100,
-                }}
-              />
-            ),
+            
             tabBarLabel: 'Electricity',
             tabBarLabelStyle: {
               color: Colors.dark.text,

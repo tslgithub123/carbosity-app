@@ -27,7 +27,7 @@ export default function WelcomeScreen1() {
       
       // Log the raw response text
       const text = await response.text();
-      console.log('Raw response:', text);
+      console.log('Raw response: ', text);
       
       // Try parsing the text manually
       const data = text;
