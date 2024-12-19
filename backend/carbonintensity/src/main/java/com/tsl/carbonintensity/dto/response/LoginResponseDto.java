@@ -1,28 +1,37 @@
 package com.tsl.carbonintensity.dto.response;
 
-public class LoginResponse {
-
-    private String emailId;
+public class LoginResponseDto {
+    private String token;
+    private String emailAddress;
     private String role;
     private String firstName;
     private String lastName;
 
-    public LoginResponse() {
+    public LoginResponseDto() {
     }
 
-    public LoginResponse(String emailId, String role, String firstName, String lastName) {
-        this.emailId = emailId;
+    public LoginResponseDto(String token, String emailAddress, String role, String firstName, String lastName) {
+        this.token = token;
+        this.emailAddress = emailAddress;
         this.role = role;
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
-    public String getEmailId() {
-        return emailId;
+    public String getToken() {
+        return token;
     }
 
-    public void setEmailId(String emailId) {
-        this.emailId = emailId;
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
     }
 
     public String getRole() {

@@ -2,8 +2,8 @@ package com.tsl.carbonintensity.service;
 
 import com.tsl.carbonintensity.entity.User;
 import com.tsl.carbonintensity.repository.UserRepository;
-import com.tsl.kyc.security.UserDetailsImpl;
 
+import com.tsl.carbonintensity.security.UserDetailsImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,9 +19,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+    public UserDetails loadUserByUsername(String emailId) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(emailId)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + emailId));
         return UserDetailsImpl.build(user);
     }
 }

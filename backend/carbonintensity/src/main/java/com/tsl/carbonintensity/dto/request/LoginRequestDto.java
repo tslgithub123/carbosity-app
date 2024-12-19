@@ -1,4 +1,4 @@
-package com.tsl.carbonintensity.dto;
+package com.tsl.carbonintensity.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,23 +6,23 @@ import lombok.Setter;
 @Setter
 @Getter
 public class LoginRequestDto {
-    private String emailId;
+    private String emailAddress;
     private String password;
 
     public LoginRequestDto() {
     }
 
-    public LoginRequestDto(String emailId, String password) {
-        this.emailId = emailId;
+    public LoginRequestDto(String emailAddress, String password) {
+        this.emailAddress = emailAddress;
         this.password = password;
     }
 
-    public String getEmailId() {
-        return emailId;
+    public String getEmailAddress() {
+        return emailAddress;
     }
 
-    public void setEmailId(String emailId) {
-        this.emailId = emailId;
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
     }
 
     public String getPassword() {
@@ -36,7 +36,7 @@ public class LoginRequestDto {
     @Override
     public String toString() {
         return "LoginRequestDto{" +
-                "username='" + emailId + '\'' +
+                "username='" + emailAddress + '\'' +
                 ", password='" + password + '\'' +
                 '}';
     }

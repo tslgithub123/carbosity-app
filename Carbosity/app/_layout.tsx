@@ -2,7 +2,7 @@ import { useFonts } from 'expo-font';
 import { Navigator, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import 'react-native-reanimated';
 import {
   Provider as PaperProvider,
@@ -11,12 +11,16 @@ import {
 } from 'react-native-paper';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { Platform } from 'react-native';
+import * as NavigationBar from 'expo-navigation-bar';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Prevent the splash screen from auto-hiding until fonts are loaded
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme(); // Detect light/dark mode
+  const queryClient = new QueryClient()
+  const colorScheme = useColorScheme();
   const [fontsLoaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -27,22 +31,48 @@ export default function RootLayout() {
     }
   }, [fontsLoaded]);
 
+  // Define your light and dark themes
+  const lightTheme = useMemo(
+    () => ({
+      ...MD3LightTheme,
+      colors: {
+        ...MD3LightTheme.colors,
+        primary: '#6200ee', // Customize primary color
+        secondary: '#03dac6', // Customize secondary color
+      },
+    }),
+    []
+  );
+
+  const darkTheme = useMemo(
+    () => ({
+      ...MD3DarkTheme,
+      colors: {
+        ...MD3DarkTheme.colors,
+        primary: '#bb86fc',
+        secondary: '#03dac6',
+      },
+    }),
+    []
+  );
+
+  const theme = useMemo(() => (colorScheme === 'dark' ? darkTheme : lightTheme), [colorScheme]);
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      NavigationBar.setBackgroundColorAsync(theme.colors.background);
+      NavigationBar.setButtonStyleAsync(
+        colorScheme === 'dark' ? 'light' : 'dark'
+      );
+    }
+  }, [theme, colorScheme]);
+
   if (!fontsLoaded) {
-    return null; // Render nothing until fonts are loaded
+    return null; // Wait for fonts to load
   }
 
-  const lightTheme = {
-    ...MD3LightTheme,
-    colors: {
-      ...MD3LightTheme.colors,
-      primary: '#4CAF50',
-    },
-  };
-
-  // Select the theme based on the color scheme
-  const theme = colorScheme === 'dark' ? MD3DarkTheme : lightTheme;
-
   return (
+    <QueryClientProvider client={queryClient}>
     <PaperProvider theme={theme}>
       <Stack>
         {/* Index screen */}
@@ -53,10 +83,16 @@ export default function RootLayout() {
         <Stack.Screen name="welcome/screen1" options={{ headerShown: false }} />
         <Stack.Screen name="welcome/screen2" options={{ headerShown: false }} />
 
+        {/* Auth screens */}
+        <Stack.Screen name="login/index" options={{ headerShown: false }} />
+
         {/* Not found screen */}
         <Stack.Screen name="+not-found" />
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar
+        style='auto'
+      />
     </PaperProvider>
+    </QueryClientProvider>
   );
 }
