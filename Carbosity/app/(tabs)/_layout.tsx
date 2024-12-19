@@ -1,37 +1,31 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, LogBox, Platform } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { BottomNavigation } from 'react-native-paper';
+import { BottomNavigation, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import HomeScreen from '.';
 import ExploreScreen from './explore';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useTheme } from '@react-navigation/native';
+
 import * as NavigationBar from 'expo-navigation-bar';
+import ElectricityHome from '../electricity';
+import { Colors } from '@/constants/Colors';
 
 const Tab = createBottomTabNavigator();
 
-LogBox.ignoreLogs([
-  'A props object containing a "key" prop is being spread into JSX',
-]);
-
 export default function MyComponent() {
-  const { colors } = useTheme();
-  const tabBarColor = colors.card;
-  const bgColor = colors.background;
+  const theme = useTheme();
+  const tabBarBackgroundColor = theme.dark ? Colors.dark.card : Colors.light.card;
+  const tabBarIconColor = theme.dark ? Colors.dark.icon : Colors.light.icon;
+  const focusedTabBarIconColor = theme.dark ? Colors.dark.focusedIcon : Colors.light.focusedIcon;
+
   useEffect(() => {
     if (Platform.OS === 'android') {
-      NavigationBar.setBackgroundColorAsync(tabBarColor);
-      NavigationBar.setButtonStyleAsync('light');
+      NavigationBar.setBackgroundColorAsync(tabBarBackgroundColor);
+      NavigationBar.setButtonStyleAsync(theme.dark ? 'light' : 'dark');
     }
-    return () => {
-      if (Platform.OS === 'android') {
-        NavigationBar.setBackgroundColorAsync(bgColor);
-        NavigationBar.setButtonStyleAsync('dark');
-      }
-    };
-  }, [tabBarColor]);
+  }, [theme, tabBarBackgroundColor]);
 
   return (
     <SafeAreaProvider>
@@ -39,7 +33,7 @@ export default function MyComponent() {
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: tabBarColor,
+            backgroundColor: tabBarBackgroundColor,
             elevation: 0,
             borderTopWidth: 0,
             position: 'absolute',
@@ -47,13 +41,16 @@ export default function MyComponent() {
             left: 0,
             right: 0,
           },
+          tabBarLabelStyle: {
+            color: tabBarIconColor,
+          },
         }}
         tabBar={({ navigation, state, descriptors, insets }) => (
           <BottomNavigation.Bar
             navigationState={state}
             safeAreaInsets={insets}
             style={{
-              backgroundColor: bgColor,
+              backgroundColor: tabBarBackgroundColor,
               elevation: 0,
               borderTopWidth: 0,
               position: 'absolute',
@@ -77,10 +74,10 @@ export default function MyComponent() {
                 });
               }
             }}
-            renderIcon={({ route, focused, color }) => {
+            renderIcon={({ route, focused }) => {
               const { options } = descriptors[route.key];
               if (options.tabBarIcon) {
-                return options.tabBarIcon({ focused, color, size: 30 });
+                return options.tabBarIcon({ focused, color: focused ? focusedTabBarIconColor : tabBarIconColor, size: 30 });
               }
               return null;
             }}
@@ -90,8 +87,8 @@ export default function MyComponent() {
                 options.tabBarLabel !== undefined
                   ? options.tabBarLabel
                   : options.title !== undefined
-                    ? options.title
-                    : route.name;
+                  ? options.title
+                  : route.name;
               return typeof label === 'string' ? label : undefined;
             }}
           />
@@ -102,31 +99,33 @@ export default function MyComponent() {
           component={HomeScreen}
           options={{
             tabBarLabel: 'Home',
-            tabBarIcon: ({ focused }) => {
-              return (
-                <MaterialCommunityIcons
-                  name="home"
-                  size={24}
-                  color={focused ? '#6200ee' : '#999'}
-                />
-              );
-            },
+            tabBarIcon: ({ focused }) => (
+              <MaterialCommunityIcons
+                name="home"
+                size={24}
+                color={focused ? focusedTabBarIconColor : tabBarIconColor}
+              />
+            ),
           }}
         />
         <Tab.Screen
-          name="Explore"
-          component={ExploreScreen}
+          name="Electricity"
+          component={ElectricityHome}
           options={{
-            tabBarLabel: 'Explore',
-            tabBarIcon: ({ focused }) => {
-              return (
-                <MaterialCommunityIcons
-                  name="magnify"
-                  size={24}
-                  color={focused ? '#03dac6' : '#999'}
-                />
-              );
+            headerShown: true,
+            headerTintColor: theme.colors.primary,
+            
+            tabBarLabel: 'Electricity',
+            tabBarLabelStyle: {
+              color: Colors.dark.text,
             },
+            tabBarIcon: ({ focused }) => (
+              <MaterialCommunityIcons
+                name="lightning-bolt"
+                size={24}
+                color={focused ? focusedTabBarIconColor : tabBarIconColor}
+              />
+            ),
           }}
         />
       </Tab.Navigator>

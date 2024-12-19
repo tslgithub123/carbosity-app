@@ -9,14 +9,16 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tsl-it.Carbosity"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.tsl_it.Carbosity"
+      "package": "com.tsl_it.Carbosity",
+      "permissions": ["INTERNET"]
     },
     "web": {
       "bundler": "metro",

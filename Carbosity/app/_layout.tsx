@@ -1,77 +1,98 @@
-import { DarkTheme as NavigationDarkTheme, DefaultTheme as NavigationDefaultTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Navigator, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import 'react-native-reanimated';
-import { Provider as PaperProvider, MD3LightTheme, MD3DarkTheme as PaperDarkTheme, DefaultTheme as PaperDefaultTheme } from 'react-native-paper';
+import {
+  Provider as PaperProvider,
+  MD3LightTheme,
+  MD3DarkTheme,
+} from 'react-native-paper';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { Platform } from 'react-native';
+import * as NavigationBar from 'expo-navigation-bar';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+// Prevent the splash screen from auto-hiding until fonts are loaded
 SplashScreen.preventAutoHideAsync();
 
-const CombinedDefaultTheme = {
-  ...NavigationDefaultTheme,
-  ...MD3LightTheme,
-  colors: {
-    ...NavigationDefaultTheme.colors,
-    ...MD3LightTheme.colors,
-  },
-  fonts: {
-    ...NavigationDefaultTheme.fonts,
-    ...MD3LightTheme.fonts,
-  },
-};
-
-const CombinedDarkTheme = {
-  ...NavigationDarkTheme,
-  ...PaperDarkTheme,
-  colors: {
-    ...NavigationDarkTheme.colors,
-    ...PaperDarkTheme.colors,
-  },
-  fonts: {
-    ...NavigationDarkTheme.fonts,
-    ...PaperDarkTheme.fonts,
-  },
-};
-
 export default function RootLayout() {
+  const queryClient = new QueryClient()
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
+  const [fontsLoaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   useEffect(() => {
-    if (loaded) {
+    if (fontsLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [fontsLoaded]);
 
-  if (!loaded) {
-    return null;
+  // Define your light and dark themes
+  const lightTheme = useMemo(
+    () => ({
+      ...MD3LightTheme,
+      colors: {
+        ...MD3LightTheme.colors,
+        primary: '#6200ee', // Customize primary color
+        secondary: '#03dac6', // Customize secondary color
+      },
+    }),
+    []
+  );
+
+  const darkTheme = useMemo(
+    () => ({
+      ...MD3DarkTheme,
+      colors: {
+        ...MD3DarkTheme.colors,
+        primary: '#bb86fc',
+        secondary: '#03dac6',
+      },
+    }),
+    []
+  );
+
+  const theme = useMemo(() => (colorScheme === 'dark' ? darkTheme : lightTheme), [colorScheme]);
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      NavigationBar.setBackgroundColorAsync(theme.colors.background);
+      NavigationBar.setButtonStyleAsync(
+        colorScheme === 'dark' ? 'light' : 'dark'
+      );
+    }
+  }, [theme, colorScheme]);
+
+  if (!fontsLoaded) {
+    return null; // Wait for fonts to load
   }
 
-  const theme = colorScheme === 'dark' ? CombinedDarkTheme : CombinedDefaultTheme;
-
   return (
+    <QueryClientProvider client={queryClient}>
     <PaperProvider theme={theme}>
-      <NavigationThemeProvider value={theme}>
-        <Stack>
-          {/* Index screen */}
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack>
+        {/* Index screen */}
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-          {/* Welcome screens */}
-          <Stack.Screen name="welcome/screen1" options={{ headerShown: false }} />
-          <Stack.Screen name="welcome/screen2" options={{ headerShown: false }} />
+        {/* Welcome screens */}
+        <Stack.Screen name="welcome/screen1" options={{ headerShown: false }} />
+        <Stack.Screen name="welcome/screen2" options={{ headerShown: false }} />
 
-          {/* Not found screen */}
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
-      </NavigationThemeProvider>
+        {/* Auth screens */}
+        <Stack.Screen name="login/index" options={{ headerShown: false }} />
+
+        {/* Not found screen */}
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <StatusBar
+        style='auto'
+      />
     </PaperProvider>
+    </QueryClientProvider>
   );
 }
