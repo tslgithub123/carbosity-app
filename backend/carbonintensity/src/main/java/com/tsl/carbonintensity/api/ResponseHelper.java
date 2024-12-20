@@ -33,6 +33,19 @@ public class ResponseHelper {
     }
 
     /**
+     * Build an authentication response with a token.
+     *
+     * @param status     The status of the response (e.g., SUCCESS).
+     * @param messageKey The message key to retrieve from the Message class.
+     * @param data      The response data payload with token.
+     * @return A ResponseEntity containing the ApiResponse.
+     */
+    public static <T> ResponseEntity<ApiResponse<T>>  buildAuthResponse(String token, String status, String messageKey, T data) {
+        ApiResponse<T> response = new ApiResponse<>(status, messageKey, data);
+        return ResponseEntity.ok().header("Authorization", "Bearer " + token).body(response);
+    }
+
+    /**
      * Build a not found response for a specific entity.
      *
      * @param entityName The name of the entity (e.g., "User").

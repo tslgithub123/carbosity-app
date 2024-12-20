@@ -18,7 +18,10 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.tsl_it.Carbosity",
-      "permissions": ["INTERNET"]
+      "permissions": ["INTERNET"],
+      "config": {
+        "useCleartextTraffic": true
+      }
     },
     "web": {
       "bundler": "metro",

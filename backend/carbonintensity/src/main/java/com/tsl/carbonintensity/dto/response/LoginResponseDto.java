@@ -1,21 +1,17 @@
 package com.tsl.carbonintensity.dto.response;
 
+import com.tsl.carbonintensity.entity.User;
+
 public class LoginResponseDto {
     private String token;
-    private String emailAddress;
-    private String role;
-    private String firstName;
-    private String lastName;
+    private User user;
 
     public LoginResponseDto() {
     }
 
-    public LoginResponseDto(String token, String emailAddress, String role, String firstName, String lastName) {
+    public LoginResponseDto(String token, User user){
         this.token = token;
-        this.emailAddress = emailAddress;
-        this.role = role;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.user = user;
     }
 
     public String getToken() {
@@ -26,35 +22,11 @@ public class LoginResponseDto {
         this.token = token;
     }
 
-    public String getEmailAddress() {
-        return emailAddress;
+    public User getUser() {
+        return user;
     }
 
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setUser(User user) {
+        this.user = user;
     }
 }

@@ -61,12 +61,15 @@ public class SecurityConfig {
         if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
             configuration.setAllowedOrigins(List.of(allowedOrigins));
         } else {
-            configuration.setAllowedOrigins(List.of("http://localhost:8081", "http://" + currentIp + ":5173"));
+            //configuration.setAllowedOrigins(List.of("http://localhost:8081", "http://" + currentIp + ":8081"));
+            //configuration.setAllowedOrigins(Arrays.asList("http://192.168.1.*:8081", "http://localhost:8081", "http://" + currentIp + ":8081"));
+            configuration.setAllowedOrigins((List.of("*")));
         }
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
+        configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token", "Accept"));
         configuration.setExposedHeaders(List.of("x-auth-token"));
-        configuration.setAllowCredentials(true);
+
+        //configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

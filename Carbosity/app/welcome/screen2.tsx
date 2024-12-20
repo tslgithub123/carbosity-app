@@ -8,6 +8,7 @@ import { useEffect } from "react";
 export default function WelcomeScreen2() {
   const router = useRouter();
   const { user, setUser } = useAuthStore();
+  const {setIsWelcomed} = useAuthStore();
 
   useEffect(() => {
     if (!user) {
@@ -20,7 +21,7 @@ export default function WelcomeScreen2() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText style={styles.text}>Welcome to Screen 2!</ThemedText>
-      <Button title="Next" onPress={() => router.replace("/login")} />
+      <Button title="Next" onPress={() => {router.replace("/login")}} />
     </ThemedView>
   );
 }
