@@ -11,14 +11,20 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as NavigationBar from 'expo-navigation-bar';
 import ElectricityHome from '../electricity';
 import { Colors } from '@/constants/Colors';
+import Settings from '../profile';
+import useAuthStore from '@/store/useAuthStore';
+import Profile from '../profile';
 
 const Tab = createBottomTabNavigator();
 
 export default function MyComponent() {
   const theme = useTheme();
+  const headerColor = theme.dark ? Colors.dark.background : Colors.light.background;
   const tabBarBackgroundColor = theme.dark ? Colors.dark.card : Colors.light.card;
   const tabBarIconColor = theme.dark ? Colors.dark.icon : Colors.light.icon;
   const focusedTabBarIconColor = theme.dark ? Colors.dark.focusedIcon : Colors.light.focusedIcon;
+
+  const {user} = useAuthStore();
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -114,7 +120,9 @@ export default function MyComponent() {
           options={{
             headerShown: true,
             headerTintColor: theme.colors.primary,
-            
+            headerBackground: () => (
+              <View style={{ backgroundColor: headerColor }} />
+            ),
             tabBarLabel: 'Electricity',
             tabBarLabelStyle: {
               color: Colors.dark.text,
@@ -122,6 +130,26 @@ export default function MyComponent() {
             tabBarIcon: ({ focused }) => (
               <MaterialCommunityIcons
                 name="lightning-bolt"
+                size={24}
+                color={focused ? focusedTabBarIconColor : tabBarIconColor}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="My Profile"
+          component={Profile}
+          options={{
+            headerShown: true,
+            headerTintColor: theme.colors.primary,
+            
+            tabBarLabel: user?.firstName || 'Profile',
+            tabBarLabelStyle: {
+              color: Colors.dark.text,
+            },
+            tabBarIcon: ({ focused }) => (
+              <MaterialCommunityIcons
+                name="account"
                 size={24}
                 color={focused ? focusedTabBarIconColor : tabBarIconColor}
               />

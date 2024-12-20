@@ -5,8 +5,11 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Button } from 'react-native-paper';
+import useAuthStore from '@/store/useAuthStore';
 
 export default function HomeScreen() {
+
+  const {user} = useAuthStore.getState();
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -17,7 +20,7 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
+        <ThemedText type="title">Welcome {user?.firstName}!</ThemedText>
         {/* <HelloWave /> */}
       </ThemedView>
       {/* <ThemedView style={styles.stepContainer}>
