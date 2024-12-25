@@ -14,6 +14,7 @@ import { Colors } from '@/constants/Colors';
 import Settings from '../profile';
 import useAuthStore from '@/store/useAuthStore';
 import Profile from '../profile';
+import Test from '../welcome/test';
 
 const Tab = createBottomTabNavigator();
 
@@ -130,6 +131,30 @@ export default function MyComponent() {
         tabBarIcon: ({ focused }) => (
           <MaterialCommunityIcons
             name="lightning-bolt"
+            size={24}
+            color={focused ? focusedTabBarIconColor : tabBarIconColor}
+          />
+        ),
+          }}
+        />
+        <Tab.Screen
+          name="Test"
+          component={Test}
+          
+          options={{
+        headerShown: true,
+        headerStyle: {
+          backgroundColor: headerColor,
+        },
+        headerTintColor: theme.colors.primary,
+        
+        tabBarLabel: 'Test',
+        tabBarLabelStyle: {
+          color: Colors.dark.text,
+        },
+        tabBarIcon: ({ focused }) => (
+          <MaterialCommunityIcons
+            name="test-tube"
             size={24}
             color={focused ? focusedTabBarIconColor : tabBarIconColor}
           />
