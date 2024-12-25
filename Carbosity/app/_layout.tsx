@@ -14,6 +14,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { Platform } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemedView } from '@/components/ThemedView';
 
 // Prevent the splash screen from auto-hiding until fonts are loaded
 SplashScreen.preventAutoHideAsync();
@@ -74,6 +75,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
     <PaperProvider theme={theme}>
+      <ThemedView style={{ flex: 1 }}>
       <Stack>
         {/* Index screen */}
         <Stack.Screen name="index" options={{ headerShown: false }} />
@@ -92,6 +94,7 @@ export default function RootLayout() {
         {/* Not found screen */}
         <Stack.Screen name="+not-found" />
       </Stack>
+      </ThemedView>
       <StatusBar
         style='auto'
       />

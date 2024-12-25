@@ -4,61 +4,42 @@ import { router } from "expo-router";
 import { StyleSheet } from "react-native";
 import { Button, TextInput, Surface, useTheme } from "react-native-paper";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 import useAuthStore from "@/store/useAuthStore";
-import { User } from "@/types/User";
+import { useLogin } from "@/api";
 
 export default function Login() {
   const theme = useTheme();
-  const [email, setEmail] = useState("");
+  const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [responseData, setResponseData] = useState<User>();
 
-  const validateInputs = () => email.trim() && password.trim();
+  const { setToken, setUser } = useAuthStore.getState();
 
-  const {setToken, setUser} = useAuthStore.getState();
-  
+  const loginMutation = useLogin();
 
-  const loginMutation = useMutation<any, Error, { emailAddress: string; password: string }>({
-    mutationFn: async (credentials) => {
-      const response = await fetch("http://192.168.1.47:8085/api/auth/login", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        const errorMessage = errorData?.message || "Login failed.";
-        throw new Error(errorMessage);
-      }
-    const token = response.headers.get("authorization")?.slice(7);
-    // if header is present then console log it
-    if (token) {
-      setToken(token);
-    } else {
-      setToken("");
-    }
-      return response.json();
-    },
-    onSuccess: (data) => {
-      console.log("Login success:", data);
-      setUser(data?.data);
-      setResponseData(data);
-      router.replace("/(tabs)");
-    },
-    onError: (error) => {
-      console.error("Login error:", error.message);
-    },
-  });
+  const validateInputs = () => emailAddress.trim() && password.trim();
 
   const handleLogin = () => {
     if (!validateInputs()) return;
-    loginMutation.mutate({ emailAddress: email, password });
+
+    loginMutation.mutate(
+      {
+        emailAddress, password
+      },
+      {
+        onSuccess: (data) => {
+          console.log("Login success:", data);
+          const token = data?.headers?.authorization?.slice(7) || "";
+          setToken(token);
+          setUser(data?.data);
+          router.replace("/(tabs)");
+        },
+        onError: (error: any) => {
+          console.log("Login error:", {emailAddress}, {password});
+          console.error("Login error:", error.message);
+        },
+      }
+    );
   };
 
   return (
@@ -74,8 +55,8 @@ export default function Login() {
         <TextInput
           mode="outlined"
           label="Email"
-          value={email}
-          onChangeText={setEmail}
+          value={emailAddress}
+          onChangeText={setEmailAddress}
           style={styles.input}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -113,15 +94,9 @@ export default function Login() {
 
         {loginMutation.isError && (
           <ThemedText style={[styles.errorText, { color: theme.colors.error }]}>
-            {loginMutation.error.message}
+            {loginMutation.error?.message}
           </ThemedText>
         )}
-
-        {/* {responseData && (
-          <ThemedText style={[styles.successText, { color: theme.colors.primary }]}>
-            Welcome, {responseData.data.firstName || "User"}!
-          </ThemedText>
-        )} */}
 
         <Button
           mode="text"
@@ -173,11 +148,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   errorText: {
-    fontSize: 14,
-    textAlign: "center",
-    marginTop: 8,
-  },
-  successText: {
     fontSize: 14,
     textAlign: "center",
     marginTop: 8,
