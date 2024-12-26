@@ -6,6 +6,8 @@ import { Button, TextInput, Surface, useTheme } from "react-native-paper";
 import { useState } from "react";
 import useAuthStore from "@/store/useAuthStore";
 import { useLogin } from "@/api";
+import { User } from "@/types/User";
+import { ApiResponse } from "@/types/ApiResponse";
 
 export default function Login() {
   const theme = useTheme();
@@ -28,11 +30,14 @@ export default function Login() {
       },
       {
         onSuccess: (data) => {
-          console.log("Login success:", data);
-          const token = data?.headers?.authorization?.slice(7) || "";
-          setToken(token);
-          setUser(data?.data);
-          router.replace("/(tabs)");
+            console.log("Login success:", data);
+            const token = data.headers.map.authorization.slice(7) || "";
+            console.log("Token:", token);
+            setToken(token);
+            data.json().then((data: ApiResponse<User>) => {
+            setUser(data.data);
+            router.replace("/(tabs)");
+            });
         },
         onError: (error: any) => {
           console.log("Login error:", {emailAddress}, {password});
@@ -106,6 +111,15 @@ export default function Login() {
         >
           Skip for now
         </Button>
+
+        <Button
+          mode="text"
+          onPress={() => router.push("/register")}
+          style={styles.registerButton}
+          textColor={theme.colors.primary}
+        >
+          Don't have an account? Register
+        </Button>
       </Surface>
     </ThemedView>
   );
@@ -127,6 +141,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "600",
+    paddingTop: 8,
     marginBottom: 8,
     textAlign: "center",
   },
@@ -144,6 +159,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   skipButton: {
+    marginTop: 8,
+    alignSelf: "center",
+  },
+  registerButton: {
     marginTop: 8,
     alignSelf: "center",
   },

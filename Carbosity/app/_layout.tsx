@@ -87,6 +87,7 @@ export default function RootLayout() {
 
         {/* Auth screens */}
         <Stack.Screen name="login/index" options={{ headerShown: false }} />
+        <Stack.Screen name="register/index" options={{ headerShown: false }} />
 
         {/* Settings screens */}
         <Stack.Screen name="profile/index" options={{ headerShown: false }} />
