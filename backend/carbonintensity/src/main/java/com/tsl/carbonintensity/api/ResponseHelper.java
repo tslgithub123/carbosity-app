@@ -66,7 +66,7 @@ public class ResponseHelper {
      * @param messageKey The message key to retrieve from the Message class.
      * @return A ResponseEntity containing the ApiResponse.
      */
-    public static ResponseEntity<ApiResponse<Object>> buildConflictResponse(String token, String messageKey) {
+    public static ResponseEntity<ApiResponse<Object>> buildConflictResponse(String messageKey) {
         ApiResponse<Object> response = new ApiResponse<>(Status.ERROR, messageKey, null);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }

@@ -10,6 +10,7 @@ import useAuthStore from '@/store/useAuthStore';
 export default function HomeScreen() {
 
   const {user} = useAuthStore.getState();
+  console.log('User:', user);
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
