@@ -7,7 +7,7 @@ import java.util.Map;
 public class ResponseHelper {
 
     /**
-     * Build a generic success response with a token.
+     * Build a generic success response.
      *
      * @param status     The status of the response (e.g., SUCCESS).
      * @param messageKey The message key to retrieve from the Message class.
@@ -20,7 +20,7 @@ public class ResponseHelper {
     }
 
     /**
-     * Build an error response with token (optional).
+     * Build an error response.
      *
      * @param status     The status of the response (e.g., ERROR).
      * @param messageKey The message key to retrieve from the Message class.
@@ -33,7 +33,7 @@ public class ResponseHelper {
     }
 
     /**
-     * Build an authentication response with a token.
+     * Build an authentication response.
      *
      * @param status     The status of the response (e.g., SUCCESS).
      * @param messageKey The message key to retrieve from the Message class.
@@ -62,7 +62,6 @@ public class ResponseHelper {
     /**
      * Build a conflict response, typically for duplicate resources.
      *
-     * @param token      The JWT token (optional).
      * @param messageKey The message key to retrieve from the Message class.
      * @return A ResponseEntity containing the ApiResponse.
      */
@@ -93,7 +92,7 @@ public class ResponseHelper {
     }
 
     /**
-     * Build an unauthorized response with a custom message and token.
+     * Build an unauthorized response.
      *
      * @param messageKey The message key to retrieve from the Message class.
      * @return A ResponseEntity containing the ApiResponse.

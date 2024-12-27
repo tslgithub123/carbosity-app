@@ -15,8 +15,8 @@ import { Platform } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemedView } from '@/components/ThemedView';
+import { MaterialTheme } from '@/constants/MaterialTheme';
 
-// Prevent the splash screen from auto-hiding until fonts are loaded
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -32,14 +32,12 @@ export default function RootLayout() {
     }
   }, [fontsLoaded]);
 
-  // Define your light and dark themes
+  
   const lightTheme = useMemo(
     () => ({
-      ...MD3LightTheme,
       colors: {
-        ...MD3LightTheme.colors,
-        primary: '#6200ee', // Customize primary color
-        secondary: '#03dac6', // Customize secondary color
+...MD3LightTheme,
+        ...MaterialTheme.schemes.light,
       },
     }),
     []
@@ -49,9 +47,7 @@ export default function RootLayout() {
     () => ({
       ...MD3DarkTheme,
       colors: {
-        ...MD3DarkTheme.colors,
-        primary: '#bb86fc',
-        secondary: '#03dac6',
+        ...MaterialTheme.schemes.dark,
       },
     }),
     []
@@ -74,32 +70,30 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-    <PaperProvider theme={theme}>
-      <ThemedView style={{ flex: 1 }}>
-      <Stack>
-        {/* Index screen */}
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <PaperProvider theme={theme}>
+        <ThemedView style={{ flex: 1 }}>
+          <Stack>
+            {/* Index screen */}
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-        {/* Welcome screens */}
-        <Stack.Screen name="welcome/screen1" options={{ headerShown: false }} />
-        <Stack.Screen name="welcome/screen2" options={{ headerShown: false }} />
+            {/* Welcome screens */}
+            <Stack.Screen name="welcome/screen1" options={{ headerShown: false }} />
+            <Stack.Screen name="welcome/screen2" options={{ headerShown: false }} />
 
-        {/* Auth screens */}
-        <Stack.Screen name="login/index" options={{ headerShown: false }} />
-        <Stack.Screen name="register/index" options={{ headerShown: false }} />
+            {/* Auth screens */}
+            <Stack.Screen name="login/index" options={{ headerShown: false }} />
+            <Stack.Screen name="register/index" options={{ headerShown: false }} />
 
-        {/* Settings screens */}
-        <Stack.Screen name="profile/index" options={{ headerShown: false }} />
+            {/* Settings screens */}
+            <Stack.Screen name="profile/index" options={{ headerShown: false }} />
 
-        {/* Not found screen */}
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      </ThemedView>
-      <StatusBar
-        style='auto'
-      />
-    </PaperProvider>
+            {/* Not found screen */}
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </ThemedView>
+        <StatusBar style="auto" />
+      </PaperProvider>
     </QueryClientProvider>
   );
 }
