@@ -1,13 +1,14 @@
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { router } from "expo-router";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Button, TextInput, Surface, useTheme } from "react-native-paper";
 import { useState } from "react";
 import useAuthStore from "@/store/useAuthStore";
 import { useLogin } from "@/api";
 import { User } from "@/types/User";
 import { ApiResponse } from "@/types/ApiResponse";
+import { MaterialTheme } from "@/constants/MaterialTheme";
 
 export default function Login() {
   const theme = useTheme();
@@ -16,7 +17,6 @@ export default function Login() {
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   const { setToken, setUser } = useAuthStore.getState();
-
   const loginMutation = useLogin();
 
   const validateInputs = () => emailAddress.trim() && password.trim();
@@ -25,35 +25,39 @@ export default function Login() {
     if (!validateInputs()) return;
 
     loginMutation.mutate(
-      {
-        emailAddress, password
-      },
+      { emailAddress, password },
       {
         onSuccess: (data) => {
-            console.log("Login success:", data);
-            const token = data.headers.map.authorization.slice(7) || "";
-            console.log("Token:", token);
-            setToken(token);
-            data.json().then((data: ApiResponse<User>) => {
+          console.log("Login success:", data);
+          const token = data.headers.map.authorization.slice(7) || "";
+          console.log("Token:", token);
+          setToken(token);
+          data.json().then((data: ApiResponse<User>) => {
             setUser(data.data);
             router.replace("/(tabs)");
-            });
+          });
         },
         onError: (error: any) => {
-          console.log("Login error:", {emailAddress}, {password});
+          console.log("Login error:", { emailAddress }, { password });
           console.error("Login error:", error.message);
         },
       }
     );
   };
 
+  // Get colors from MaterialTheme based on the current theme mode
+  const colors = theme.dark
+    ? MaterialTheme.schemes.dark
+    : MaterialTheme.schemes.light;
+    
+
   return (
-    <ThemedView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Surface style={styles.formContainer} elevation={3}>
-        <ThemedText style={[styles.title, { color: theme.colors.onSurface }]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Surface style={styles.formContainer} >
+        <ThemedText style={[styles.title, { color: colors.onSurface }]}>
           Login
         </ThemedText>
-        <ThemedText style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
+        <ThemedText style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>
           Access your account to continue
         </ThemedText>
 
@@ -85,43 +89,42 @@ export default function Login() {
           theme={{ roundness: 8 }}
         />
 
-        <Button
+<Button
           mode="contained"
           onPress={handleLogin}
-          style={styles.loginButton}
+          style={[styles.loginButton, { backgroundColor: colors.primary }]} 
           loading={loginMutation.isPending}
           disabled={loginMutation.isPending || !validateInputs()}
-          buttonColor={theme.colors.primary}
-          textColor={theme.colors.onPrimary}
+          buttonColor={colors.primary}
+          textColor={colors.onPrimary} 
         >
           Login
         </Button>
-
         {loginMutation.isError && (
-          <ThemedText style={[styles.errorText, { color: theme.colors.error }]}>
+          <ThemedText style={[styles.errorText, { color: colors.error }]}>
             {loginMutation.error?.message}
           </ThemedText>
         )}
 
-        <Button
+        {/* <Button
           mode="text"
           onPress={() => router.replace("/(tabs)")}
           style={styles.skipButton}
-          textColor={theme.colors.primary}
+          textColor={colors.primary}
         >
           Skip for now
-        </Button>
+        </Button> */}
 
         <Button
           mode="text"
           onPress={() => router.push("/register")}
           style={styles.registerButton}
-          textColor={theme.colors.primary}
+          textColor={colors.primary}
         >
           Don't have an account? Register
         </Button>
       </Surface>
-    </ThemedView>
+    </View>
   );
 }
 
@@ -136,7 +139,7 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 400,
     padding: 24,
-    borderRadius: 12,
+    
   },
   title: {
     fontSize: 28,

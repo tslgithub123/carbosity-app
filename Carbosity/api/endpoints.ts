@@ -5,7 +5,12 @@ interface Endpoints {
     auth: {
         login: string;
         register: string;
-    };
+    },
+    electricity: {
+        calculate: {
+            emission: string
+        }
+    }
 }
 
 export const endpoints: Endpoints = {
@@ -14,5 +19,10 @@ export const endpoints: Endpoints = {
         login: `${api}/auth/login`,
         register: `${api}/auth/register`,
     },
+    electricity: {
+        calculate: {
+            emission: `${api}/electricity/calculate-emission`
+        }
+    }
 
 }

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { ThemedText } from '@/components/ThemedText';
 import { useRegister } from '@/api';
+import { router } from 'expo-router';
 
 const registrationSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -26,12 +27,12 @@ const registrationSchema = z.object({
 export default function RegistrationScreen() {
   const theme = useTheme();
   const [formData, setFormData] = useState({
-    firstName: 'Dhananjay',
-    lastName: 'Yelwande',
-    emailAddress: 'hello@example.com',
-    phoneNumber: '9876543215',
-    password: '@Hello123',
-    confirmPassword: '@Hello123',
+    firstName: '',
+    lastName: '',
+    emailAddress: '',
+    phoneNumber: '',
+    password: '',
+    confirmPassword: '',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [snackbar, setSnackbar] = useState({
@@ -51,6 +52,7 @@ export default function RegistrationScreen() {
           message: data.message || 'Registration successful',
           type: 'success',
         });
+        router.replace
       }
       else if (data.status === 'EMAIL_ALREADY_EXISTS') {
         console.log('Data message: ' + JSON.stringify(data))
@@ -146,6 +148,17 @@ console.log('error in error: ', error);
         onChangeText={(value) => handleChange('emailAddress', value)}
         mode="outlined"
         error={!!errors.emailAddress}
+        style={styles.input}
+      />
+      <HelperText type="error" visible={!!errors.emailAddress}>
+        {errors.emailAddress}
+      </HelperText>
+      <TextInput
+        label="Phone Number"
+        value={formData.phoneNumber}
+        onChangeText={(value) => handleChange('phoneNumber', value)}
+        mode="outlined"
+        error={!!errors.phoneNumber}
         style={styles.input}
       />
       <HelperText type="error" visible={!!errors.emailAddress}>

@@ -1,163 +1,231 @@
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { TextInput, Button, Surface, Text, useTheme } from 'react-native-paper';
+import { StyleSheet, View, Text, TextInput, Pressable, Animated, ActivityIndicator, TouchableOpacity, useColorScheme } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useState } from 'react';
+import { MaterialTheme } from '@/constants/MaterialTheme';
+import { useCalculateElectricityCarbonEmissions } from '@/api/electricity-queries';
 
-export default function ElectricityHome() {
-  const [billAmount, setBillAmount] = useState(0);
-  const [numberOfPeople, setNumberOfPeople] = useState(0);
-  const [carbonEmission, setCarbonEmission] = useState(0);
-  const theme = useTheme();
-  const emissionFactor = 0.716;
+const ElectricityHome = () => {
+  const colorScheme = useColorScheme();
+  const THEME_COLORS = colorScheme === 'dark' ? MaterialTheme.schemes.dark : MaterialTheme.schemes.light;
 
-  const unitsConsumed = (energyCharges: number) => {
-    const limits = [471, 2529, 5439];
-    const rates = [4.71, 10.29, 14.55, 16.64];
+  const [billAmount, setBillAmount] = useState('');
+  const [numPeople, setNumPeople] = useState(1); // State to manage the number of people
+  const [animatedValue] = useState(new Animated.Value(0));
+  const { data, isLoading, refetch, isError } = useCalculateElectricityCarbonEmissions(billAmount);
 
-    if (energyCharges <= limits[0]) {
-      return energyCharges / rates[0];
-    } else if (energyCharges <= limits[1]) {
-      return 100 + (energyCharges - limits[0]) / rates[1];
-    } else if (energyCharges <= limits[2]) {
-      return 300 + (energyCharges - limits[1]) / rates[2];
-    } else {
-      return 500 + (energyCharges - limits[2]) / rates[3];
-    }
+  const handleCalculate = () => {
+    console.log('Calculating emissions...' + billAmount);
+    Animated.sequence([
+      Animated.timing(animatedValue, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true
+      }),
+      Animated.timing(animatedValue, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true
+      })
+    ]).start();
+    refetch();
   };
 
-  const getPercent = (value: number, percent: number) => {
-    return (value * percent) / 100;
-  };
-
-  const calculateCarbonEmission = (billAmount: number) => {
-    const fixedCharges = 128;
-    const electricityDuty = getPercent(billAmount, 13.79);
-    const wheelingCharges = getPercent(billAmount, 11.46);
-    const fuelAdjustmentCharges = getPercent(billAmount - fixedCharges - electricityDuty, 7.1);
-
-    const energyCharges =
-      billAmount - fixedCharges - electricityDuty - wheelingCharges - fuelAdjustmentCharges;
-
-    const uConsumed = unitsConsumed(energyCharges);
-    if (!uConsumed) {
-      console.error('Invalid input');
-      return;
-    }
-    const carbonEmission = emissionFactor * (uConsumed / 1000);
-    setCarbonEmission(carbonEmission);
-  };
+  // Emissions split by the number of people
+  const emissionsPerPerson = data ? (data.data / numPeople).toFixed(2) : 0;
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText style={[styles.title]}>
-        Calculate Carbon Emission from Electricity Bill
-      </ThemedText>
-      <TextInput
-        label="Enter Bill Amount"
-        placeholder="Rs."
-        keyboardType="numeric"
-        mode="outlined"
-        style={styles.input}
-        onChangeText={(text) => setBillAmount(Number(text))}
-        left={<TextInput.Affix text="₹" />}
-      />
-      <View style={styles.counterContainer}>
-        <Text style={{ color: theme.colors.onBackground }}>Number of People</Text>
+    <View style={[styles.container, { backgroundColor: THEME_COLORS.surface }]}>
+      {/* Input Section */}
+      <View style={[styles.inputContainer, { backgroundColor: THEME_COLORS.surfaceVariant }]}>
+        <MaterialIcons name="bolt" size={24} color={THEME_COLORS.primary} />
+        <TextInput
+          style={[styles.input, { color: THEME_COLORS.onSurface }]}
+          value={billAmount}
+          onChangeText={setBillAmount}
+          placeholder="Enter bill amount"
+          keyboardType="decimal-pad"
+          returnKeyType="done"
+          maxLength={10}
+          selectionColor={THEME_COLORS.primary}
+          placeholderTextColor={THEME_COLORS.onSurfaceVariant}
+          accessible={true}
+          accessibilityLabel="Bill amount input"
+          accessibilityHint="Enter your electricity bill amount to calculate emissions"
+        />
+        <Text style={[styles.currency, { color: THEME_COLORS.onSurfaceVariant }]}>$</Text>
       </View>
-      <View style={styles.counterContainer}>
-        <Button
-          mode="contained"
-          onPress={() => setNumberOfPeople(Math.max(0, numberOfPeople - 1))}
-        >
-          <ThemedText type="default">-</ThemedText>
-        </Button>
-        <Text style={[styles.counterValue, { color: theme.colors.onBackground }]}>
-          {numberOfPeople}
-        </Text>
-        <Button
-          mode="contained"
-          onPress={() => setNumberOfPeople(Math.max(0, numberOfPeople + 1))}
-        >
-          <ThemedText type="default">+</ThemedText>
-        </Button>
-      </View>
-
-      <Button
-        mode="contained"
-        onPress={() => calculateCarbonEmission(billAmount)}
-        style={styles.button}
-      >
-        Check
-      </Button>
       
+      {/* Number of People Section */}
+      <View style={[styles.peopleContainer]}>
+        <Text style={[styles.label, { color: THEME_COLORS.onSurfaceVariant }]}>Number of People</Text>
+        <View style={styles.counterContainer}>
+          <TouchableOpacity 
+            style={[styles.counterButton, { backgroundColor: THEME_COLORS.onSecondary }]} 
+            onPress={() => setNumPeople(numPeople > 1 ? numPeople - 1 : 1)}
+            accessible={true}
+            accessibilityLabel="Decrease number of people"
+            accessibilityRole="button"
+          >
+            <MaterialIcons name="remove" size={24} color={THEME_COLORS.onPrimaryContainer} />
+          </TouchableOpacity>
+          <Text style={[styles.numPeople, { color: THEME_COLORS.onSurfaceVariant }]}>{numPeople}</Text>
+          <TouchableOpacity 
+            style={[styles.counterButton, { backgroundColor: THEME_COLORS.onSecondary }]} 
+            onPress={() => setNumPeople(numPeople + 1)}
+            accessible={true}
+            accessibilityLabel="Increase number of people"
+            accessibilityRole="button"
+          >
+            <MaterialIcons name="add" size={24} color={THEME_COLORS.onPrimaryContainer} />
+          </TouchableOpacity>
+        </View>
+      </View>
 
-      <Surface
-        style={[
-          styles.resultCard,
-          { backgroundColor: theme.colors.onPrimary},
+      {/* Calculate Button */}
+      <Pressable 
+        style={({pressed}) => [
+          styles.calculateButton,
+          { backgroundColor: THEME_COLORS.primary },
+          pressed && styles.buttonPressed
         ]}
-        elevation={2}
+        onPress={handleCalculate}
+        accessible={true}
+        accessibilityLabel="Calculate emissions"
+        accessibilityRole="button"
       >
-        <Text style={[styles.cardTitle, { color: theme.colors.primary }]}>
-          Carbon Emission
-        </Text>
-        <Text style={[styles.emission, { color: theme.colors.onSurface }]}>
-          {carbonEmission.toFixed(2)} kg CO₂e
-        </Text>
-        {numberOfPeople > 0 && (
-          <Text style={[styles.perPerson, { color: theme.colors.onSurfaceVariant }]}>
-            Per person: {(carbonEmission / numberOfPeople).toFixed(2)} kg CO₂e
+        <Text style={styles.buttonText}>Calculate Emissions</Text>
+      </Pressable>
+
+      {/* Results Section */}
+      {isLoading ? (
+        <ActivityIndicator color={THEME_COLORS.primary} />
+      ) : data ? (
+        <Animated.View 
+          style={[
+            styles.resultsContainer,
+            {
+              backgroundColor: THEME_COLORS.primaryContainer,
+              transform: [{
+                scale: animatedValue.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [1, 1.05]
+                })
+              }]
+            }
+          ]}
+        >
+          <Text style={[styles.resultValue, { color: THEME_COLORS.onPrimaryContainer }]}>{emissionsPerPerson}</Text>
+          <Text style={[styles.resultUnit, { color: THEME_COLORS.onPrimaryContainer }]}>kg CO₂ per person</Text>
+        </Animated.View>
+      ) : null}
+
+      {isError && (
+        <View style={[styles.errorContainer, { backgroundColor: THEME_COLORS.errorContainer }]}>
+          <MaterialIcons name="error-outline" size={24} color={THEME_COLORS.error} />
+          <Text style={[styles.errorText, { color: THEME_COLORS.error }]}>
+            Unable to calculate emissions. Please try again.
           </Text>
-        )}
-      </Surface>
-    </ThemedView>
+        </View>
+      )}
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    flex: 1,
+    flex: 1,  
+    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 16,
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 16,
+    padding: 12,
     marginBottom: 16,
   },
   input: {
+    flex: 1,
+    marginHorizontal: 8,
+    fontSize: 16,
+    fontWeight: '400',
+  },
+  currency: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  calculateButton: {
+    borderRadius: 20,
+    padding: 16,
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+  buttonPressed: {
+    backgroundColor: 'lightgray',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
+    letterSpacing: 0.1,
+  },
+  resultsContainer: {
+    alignItems: 'center',
+    borderRadius: 16,
+    padding: 24,
+    marginTop: 16,
+  },
+  resultValue: {
+    fontSize: 34,
+    fontWeight: '400',
+  },
+  resultUnit: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginTop: 4,
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 16,
+  },
+  errorText: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 14,
+    fontWeight: '400',
+  },
+  peopleContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    borderRadius: 16,
+    padding: 12,
     marginBottom: 16,
   },
-  button: {
-    marginVertical: 16,
+  label: {
+    fontSize: 16,
+    fontWeight: '500',
   },
   counterContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  counterValue: {
-    fontSize: 20,
-    marginHorizontal: 16,
-  },
-  resultCard: {
-    elevation: 4,
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  cardTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  emission: {
-    fontSize: 18,
-  },
-  perPerson: {
-    fontSize: 14,
     marginTop: 8,
   },
+  counterButton: {
+    borderRadius: 12,
+    padding: 8,
+    marginHorizontal: 12,
+    alignItems: 'center',
+  },
+  numPeople: {
+    fontSize: 24,
+    fontWeight: '500',
+  },
 });
+
+export default ElectricityHome;

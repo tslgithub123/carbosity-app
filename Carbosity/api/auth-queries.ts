@@ -20,6 +20,8 @@ export const useLogin = () => {
       isError: mutation.isError,
     };
   };
+
+  
   export const useRegister = (onSuccess?: (data: any) => void, onError?: (error: any) => void) => {
     const mutation = useMutation({
       mutationFn: async (credentials: Credentials) => {
@@ -37,8 +39,8 @@ export const useLogin = () => {
   
     return {
       ...mutation,
-      isPending: mutation.isPending, // Renamed to match intuitive terminology
+      isPending: mutation.isPending,
       isError: mutation.isError,
-      error: mutation.error, // Direct access to the error object for additional checks
+      error: mutation.error,
     };
   };
