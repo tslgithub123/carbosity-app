@@ -5,7 +5,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { BottomNavigation, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import HomeScreen from '.';
-import ExploreScreen from './explore';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import * as NavigationBar from 'expo-navigation-bar';
@@ -16,6 +15,8 @@ import useAuthStore from '@/store/useAuthStore';
 import Profile from '../profile';
 import Test from '../welcome/test';
 import { MaterialTheme } from '@/constants/MaterialTheme';
+import AddScreen from './add';
+import LifestyleScreen from './lifestyle';
 
 const Tab = createBottomTabNavigator();
 
@@ -41,18 +42,7 @@ export default function MyComponent() {
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
-          tabBarStyle: {
-            backgroundColor: tabBarBackgroundColor,
-            elevation: 0,
-            borderTopWidth: 0,
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-          },
-          tabBarLabelStyle: {
-            color: tabBarIconColor,
-          },
+
         }}
         tabBar={({ navigation, state, descriptors, insets }) => (
           <BottomNavigation.Bar
@@ -61,7 +51,8 @@ export default function MyComponent() {
             style={{
               backgroundColor: tabBarBackgroundColor,
               elevation: 0,
-              borderTopWidth: 0,
+              //borderTopWidth: 1, // Add border to separate tabs from screen
+              //borderTopColor: theme.dark ? MaterialTheme.schemes.dark.outlineVariant : Colors.light.tint, // Set border color
               position: 'absolute',
               bottom: 0,
               left: 0,
@@ -114,7 +105,7 @@ export default function MyComponent() {
             tabBarLabel: 'Home',
             tabBarIcon: ({ focused }) => (
               <MaterialCommunityIcons
-                name="home"
+                name="home-variant"
                 size={24}
                 color={focused ? focusedTabBarIconColor : tabBarIconColor}
               />
@@ -122,21 +113,15 @@ export default function MyComponent() {
           }}
         />
         <Tab.Screen
-          name="Electricity"
-          component={ElectricityHome}
+          name="Add"
+          component={AddScreen}
           options={{
-            headerShown: true,
-            headerTintColor: theme.colors.primary,
-            headerStyle: {
-              backgroundColor: headerColor,
-            },
-            tabBarLabel: 'Electricity',
-            tabBarLabelStyle: {
-              color: theme.dark ? Colors.dark.text : Colors.light.text,
-            },
+            
+            tabBarLabel: 'Add',
+            
             tabBarIcon: ({ focused }) => (
               <MaterialCommunityIcons
-                name="lightning-bolt"
+                name="plus-circle"
                 size={24}
                 color={focused ? focusedTabBarIconColor : tabBarIconColor}
               />
@@ -144,21 +129,17 @@ export default function MyComponent() {
           }}
         />
         <Tab.Screen
-          name="Test"
-          component={Test}
+          name="Lifestyle"
+          component={LifestyleScreen}
           options={{
-            headerShown: true,
-            headerStyle: {
-              backgroundColor: headerColor,
-            },
-            headerTintColor: theme.colors.primary,
-            tabBarLabel: 'Test',
+           
+            tabBarLabel: 'Lifestyle',
             tabBarLabelStyle: {
               color: theme.dark ? Colors.dark.text : Colors.light.text,
             },
             tabBarIcon: ({ focused }) => (
               <MaterialCommunityIcons
-                name="test-tube"
+                name="leaf"
                 size={24}
                 color={focused ? focusedTabBarIconColor : tabBarIconColor}
               />

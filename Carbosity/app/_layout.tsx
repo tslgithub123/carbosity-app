@@ -65,7 +65,7 @@ export default function RootLayout() {
   }, [theme, colorScheme]);
 
   if (!fontsLoaded) {
-    return null; // Wait for fonts to load
+    return null; 
   }
 
   return (
@@ -73,22 +73,31 @@ export default function RootLayout() {
       <PaperProvider theme={theme}>
         <ThemedView style={{ flex: 1 }}>
           <Stack>
-            {/* Index screen */}
+            {/* index screen */}
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-            {/* Welcome screens */}
+            {/* welcome screen */}
             <Stack.Screen name="welcome/screen1" options={{ headerShown: false }} />
             <Stack.Screen name="welcome/screen2" options={{ headerShown: false }} />
+            <Stack.Screen name="welcome/screen3" options={{ headerShown: false }} />
+            <Stack.Screen name="welcome/screen4" options={{ headerShown: false }} />
 
-            {/* Auth screens */}
+            {/* auth screen */}
             <Stack.Screen name="login/index" options={{ headerShown: false }} />
             <Stack.Screen name="register/index" options={{ headerShown: false }} />
 
-            {/* Settings screens */}
+            {/* add screens */}
+            <Stack.Screen name="(tabs)/add/index" options={{ headerShown: false }} />
+
+            {/* lifestyle screen */}
+            <Stack.Screen name="(tabs)/lifestyle/index" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)/lifestyle/month" options={{ headerShown: false }} />
+
+            {/* settings screen */}
             <Stack.Screen name="profile/index" options={{ headerShown: false }} />
 
-            {/* Not found screen */}
+            {/* not found screen */}
             <Stack.Screen name="+not-found" />
           </Stack>
         </ThemedView>

@@ -5,37 +5,37 @@ import React from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { lineStyles } from './lineStyles';
 
-export default function WelcomeScreen2() {
+export default function WelcomeScreen3() {
   return (
     <ThemedView style={styles.container}>
       {/* Logo or Illustration */}
-      <ThemedView style={styles.upperHalf}>
+      <View style={styles.upperHalf}>
         <Image
           source={require('../../assets/images/carbosity-header.png')}
           style={styles.logo}
         />
         
-      </ThemedView>
+      </View>
 
       {/* Lower Content */}
-      <ThemedView style={styles.lowerHalf}>
+      <View style={styles.lowerHalf}>
         <ThemedText style={lineStyles.line1}>
-          Be sustainably smart with your finances.
+        Make greener and healthier choices.
         </ThemedText>
         <ThemedText style={lineStyles.line2}>
-          Carbosity measures your environmental impact based on your expenditures.
-        </ThemedText >
-        <ThemedText style={lineStyles.line3}>
-          Track your expenses, find your impact. Measuring is the first step to sustainability.
+        Get personalised stats, offers and recommendations.
         </ThemedText>
-      </ThemedView>
+        <ThemedText style={lineStyles.line3}>
+        Offset your impact, sell credits and do more.
+        </ThemedText>
+      </View>
       <View style={styles.lowerButtons}>
         {/* Skip Button */}
         <TouchableOpacity onPress={() => router.push("/login")} style={[styles.button, styles.skipButton]}>
           <Text style={styles.buttonText}>Skip</Text>
         </TouchableOpacity>
         {/* Next Button */}
-        <TouchableOpacity onPress={() => router.push("/welcome/screen3")} style={styles.button}>
+        <TouchableOpacity onPress={() => router.push("/welcome/screen4")} style={styles.button}>
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
       </View>

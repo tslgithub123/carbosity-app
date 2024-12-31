@@ -1,4 +1,4 @@
-const api = 'http://192.168.1.58:8085/api';
+const api = 'http://192.168.1.53:8085/api';
 
 interface Endpoints {
     api: string;

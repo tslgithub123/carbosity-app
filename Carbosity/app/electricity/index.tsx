@@ -30,12 +30,12 @@ const ElectricityHome = () => {
     refetch();
   };
 
-  // Emissions split by the number of people
+  
   const emissionsPerPerson = data ? (data.data / numPeople).toFixed(2) : 0;
 
   return (
     <View style={[styles.container, { backgroundColor: THEME_COLORS.surface }]}>
-      {/* Input Section */}
+      
       <View style={[styles.inputContainer, { backgroundColor: THEME_COLORS.surfaceVariant }]}>
         <MaterialIcons name="bolt" size={24} color={THEME_COLORS.primary} />
         <TextInput
@@ -52,7 +52,8 @@ const ElectricityHome = () => {
           accessibilityLabel="Bill amount input"
           accessibilityHint="Enter your electricity bill amount to calculate emissions"
         />
-        <Text style={[styles.currency, { color: THEME_COLORS.onSurfaceVariant }]}>$</Text>
+         {/* will depend on the user country */}
+        <Text style={[styles.currency, { color: THEME_COLORS.onSurfaceVariant }]}>₹</Text>
       </View>
       
       {/* Number of People Section */}
