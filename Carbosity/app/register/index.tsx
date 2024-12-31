@@ -52,7 +52,7 @@ export default function RegistrationScreen() {
           message: data.message || 'Registration successful',
           type: 'success',
         });
-        router.replace
+        router.replace('/(tabs)')
       }
       else if (data.status === 'EMAIL_ALREADY_EXISTS') {
         console.log('Data message: ' + JSON.stringify(data))

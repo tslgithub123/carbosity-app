@@ -1,68 +1,112 @@
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import { StyleSheet, ScrollView } from "react-native";
-import { List, Button, Divider, useTheme } from "react-native-paper";
-import { useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { ScrollView } from "react-native";
+import { List, Button, Divider } from "react-native-paper";
+import { useMemo, useCallback } from "react";
 import useAuthStore from "@/store/useAuthStore";
 import { useRouter } from "expo-router";
+import { ThemedView } from "@/components/ThemedView";
 import { MaterialSwitch } from "@/components/ui/switch/MaterialSwitch";
 import { MaterialTheme } from "@/constants/MaterialTheme";
+import { useSettings } from "@/hooks/useSettings";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Profile() {
-    const theme = useTheme(); 
-    const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-    const [darkMode, setDarkMode] = useState(false);
-    const { setIsLoggedIn } = useAuthStore();
     const router = useRouter();
+    const { setIsLoggedIn } = useAuthStore();
+    const { settings, updateSettings } = useSettings(); // Custom hook for managing settings
 
-    const handleToggleNotifications = () => setNotificationsEnabled((prev) => !prev);
-    const handleToggleDarkMode = () => setDarkMode((prev) => !prev);
-    const handleLogout = () => {
+    // Memoize theme colors to prevent unnecessary re-renders
+    const colors = useMemo(() => ({
+        primary: MaterialTheme.coreColors.primary,
+        onPrimaryContainer: MaterialTheme.schemes.light.onPrimaryContainer,
+        onSurface: MaterialTheme.schemes.light.onSurface,
+        onSurfaceVariant: MaterialTheme.schemes.light.onSurfaceVariant,
+        primaryContainer: MaterialTheme.schemes.light.primaryContainer,
+        outline: MaterialTheme.schemes.light.outline,
+    }), []);
+
+    // Memoize handlers
+    const handleToggleNotifications = useCallback(() => {
+        updateSettings('notifications', !settings.notifications);
+    }, [settings.notifications, updateSettings]);
+
+    const handleToggleDarkMode = useCallback(() => {
+        updateSettings('darkMode', !settings.darkMode);
+    }, [settings.darkMode, updateSettings]);
+
+    const handleLogout = useCallback(() => {
         setIsLoggedIn(false);
         router.replace("/login");
-    };
+    }, [setIsLoggedIn, router]);
+
+    // Memoize list items to prevent unnecessary re-renders
+    const ListItems = useMemo(() => ({
+        Account: [
+            {
+                title: "Edit Profile",
+                icon: "account-edit",
+                onPress: () => console.log("Edit Profile pressed"),
+            },
+            {
+                title: "Change Password",
+                icon: "lock-reset",
+                onPress: () => console.log("Change Password pressed"),
+            },
+        ],
+        About: [
+            {
+                title: "Privacy Policy",
+                icon: "shield-account",
+                onPress: () => console.log("Privacy Policy pressed"),
+            },
+            {
+                title: "Terms of Service",
+                icon: "file-document-outline",
+                onPress: () => console.log("Terms of Service pressed"),
+            },
+        ],
+    }), []);
+
+    const renderListItem = useCallback(({ title, icon, onPress }: { title: string; icon: string; onPress: () => void }) => (
+        <List.Item
+            key={title}
+            title={title}
+            left={(props) => (
+                <List.Icon {...props} icon={icon} color={colors.onPrimaryContainer} />
+            )}
+            onPress={onPress}
+        />
+    ), [colors.onPrimaryContainer]);
 
     return (
         <ThemedView style={styles.container}>
-            <ScrollView>
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={true}
+            >
                 {/* Account Section */}
-                <List.Section>
-                    <List.Subheader style={{ color: MaterialTheme.coreColors.primary }}>
-                        Account
-                    </List.Subheader>
-                    <List.Item
-                        title="Edit Profile"
-                        left={(props) => (
-                            <List.Icon {...props} icon="account-edit" color={MaterialTheme.schemes.light.onPrimaryContainer} />
-                        )}
-                        onPress={() => console.log("Edit Profile pressed")}
-                    />
-                    <List.Item
-                        title="Change Password"
-                        left={(props) => (
-                            <List.Icon {...props} icon="lock-reset" color={MaterialTheme.schemes.light.onPrimaryContainer} />
-                        )}
-                        onPress={() => console.log("Change Password pressed")}
-                    />
-                </List.Section>
+                <List.Subheader style={[styles.subheader, { color: colors.primary }]}>
+                    Account
+                </List.Subheader>
+                {ListItems.Account.map(renderListItem)}
 
-                <Divider style={styles.divider} />
+                <Divider style={[styles.divider, { backgroundColor: colors.outline }]} />
 
                 {/* Preferences Section */}
                 <List.Section>
-                    <List.Subheader style={{ color: MaterialTheme.schemes.light.onSurfaceVariant }}>
+                    <List.Subheader style={[styles.subheader, { color: colors.onSurfaceVariant }]}>
                         Preferences
                     </List.Subheader>
                     <List.Item
                         title="Enable Notifications"
                         left={(props) => (
-                            <List.Icon {...props} icon="bell" color={MaterialTheme.schemes.light.onSurface} />
+                            <List.Icon {...props} icon="bell" color={colors.onSurface} />
                         )}
                         right={() => (
                             <MaterialSwitch
                                 switchOnIcon="check"
                                 switchOffIcon="close"
-                                selected={notificationsEnabled}
+                                selected={settings.notifications}
                                 onPress={handleToggleNotifications}
                             />
                         )}
@@ -70,40 +114,27 @@ export default function Profile() {
                     <List.Item
                         title="Dark Mode"
                         left={(props) => (
-                            <List.Icon {...props} icon="theme-light-dark" color={MaterialTheme.schemes.light.onSurface} />
+                            <List.Icon {...props} icon="theme-light-dark" color={colors.onSurface} />
                         )}
                         right={() => (
                             <MaterialSwitch
                                 switchOnIcon="check"
                                 switchOffIcon="close"
-                                selected={darkMode}
+                                selected={settings.darkMode}
                                 onPress={handleToggleDarkMode}
                             />
                         )}
                     />
                 </List.Section>
 
-                <Divider style={styles.divider} />
+                <Divider style={[styles.divider, { backgroundColor: colors.outline }]} />
 
                 {/* About Section */}
                 <List.Section>
-                    <List.Subheader style={{ color: MaterialTheme.schemes.light.onSurfaceVariant }}>
+                    <List.Subheader style={[styles.subheader, { color: colors.onSurfaceVariant }]}>
                         About
                     </List.Subheader>
-                    <List.Item
-                        title="Privacy Policy"
-                        left={(props) => (
-                            <List.Icon {...props} icon="shield-account" color={MaterialTheme.schemes.light.onSurface} />
-                        )}
-                        onPress={() => console.log("Privacy Policy pressed")}
-                    />
-                    <List.Item
-                        title="Terms of Service"
-                        left={(props) => (
-                            <List.Icon {...props} icon="file-document-outline" color={MaterialTheme.schemes.light.onSurface} />
-                        )}
-                        onPress={() => console.log("Terms of Service pressed")}
-                    />
+                    {ListItems.About.map(renderListItem)}
                 </List.Section>
 
                 {/* Logout Section */}
@@ -113,14 +144,14 @@ export default function Profile() {
                         onPress={handleLogout}
                         icon="logout"
                         style={styles.logoutButton}
-                        buttonColor={MaterialTheme.schemes.light.primaryContainer}
-                        textColor={MaterialTheme.schemes.light.onPrimaryContainer}
+                        buttonColor={colors.primaryContainer}
+                        textColor={colors.onPrimaryContainer}
                     >
                         Logout
                     </Button>
                 </ThemedView>
             </ScrollView>
-        </ThemedView>
+            </ThemedView>
     );
 }
 
@@ -128,9 +159,16 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
+    scrollContent: {
+        paddingBottom: 100,
+        flexGrow: 1,
+    },
+    subheader: {
+        fontSize: 16,
+        fontWeight: '600',
+    },
     divider: {
         marginVertical: 12,
-        backgroundColor: MaterialTheme.schemes.light.outline,
     },
     footerContainer: {
         marginTop: 24,
@@ -138,5 +176,7 @@ const styles = StyleSheet.create({
     },
     logoutButton: {
         width: "80%",
+        borderRadius: 8,
     },
 });
+

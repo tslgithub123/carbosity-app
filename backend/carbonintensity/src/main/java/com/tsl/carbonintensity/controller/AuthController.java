@@ -10,6 +10,7 @@ import com.tsl.carbonintensity.exception.UserNotFoundException;
 import com.tsl.carbonintensity.repository.EmailRepository;
 import com.tsl.carbonintensity.repository.UserRepository;
 import com.tsl.carbonintensity.security.JwtUtils;
+import com.tsl.carbonintensity.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,13 +33,15 @@ public class AuthController {
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
     private final EmailRepository emailRepository;
+    private final UserService userService;
 
-    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, JwtUtils jwtUtils, PasswordEncoder passwordEncoder, EmailRepository emailRepository) {
+    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, JwtUtils jwtUtils, PasswordEncoder passwordEncoder, EmailRepository emailRepository, UserService userService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.jwtUtils = jwtUtils;
         this.passwordEncoder = passwordEncoder;
         this.emailRepository = emailRepository;
+        this.userService = userService;
     }
 
     @PostMapping("/login")
@@ -86,7 +89,6 @@ public class AuthController {
         }
     }
 
-    @Transactional
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Object>> register(@RequestBody RegistrationRequestDto request) {
         System.out.println("Registering user: " + request);
@@ -105,23 +107,23 @@ public class AuthController {
                 return ResponseHelper.buildErrorResponse("EMAIL_ALREADY_EXISTS", "USER_ALREADY_EXISTS", HttpStatus.CONFLICT);
             }
 
-            User user = new User();
-            Email email = new Email();
-            email.setEmailId(request.getEmailAddress());
-            email.setEmailStatus("ACTIVE");
-            emailRepository.save(email);
-            user.setEmail(email);
-            user.setFirstName(request.getFirstName());
-            user.setLastName(request.getLastName());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setPhoneNumber(request.getPhoneNumber());
-            userRepository.save(user);
+            // Save user in a transactional service method
+            User user = userService.createUser(request);
 
-            return ResponseHelper.buildSuccessResponse("SUCCESS", "REGISTRATION_SUCCESS", user);
+            // Authenticate manually or move to a committed transaction
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    request.getEmailAddress(),
+                    request.getPassword()
+            );
+
+            String jwt = jwtUtils.generateToken((UserDetails) authentication.getPrincipal());
+
+            return ResponseHelper.buildAuthResponse(jwt, "SUCCESS", "REGISTRATION_SUCCESS", user);
         } catch (Exception ex) {
             return ResponseHelper.buildInternalServerErrorResponse(ex);
         }
     }
+
 
 
 

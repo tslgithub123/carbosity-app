@@ -1,12 +1,17 @@
 package com.tsl.carbonintensity.service;
 
+import com.tsl.carbonintensity.dto.request.RegistrationRequestDto;
+import com.tsl.carbonintensity.entity.Email;
+import com.tsl.carbonintensity.entity.User;
 import com.tsl.carbonintensity.repository.EmailRepository;
 import com.tsl.carbonintensity.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class userService {
+public class UserService {
+
     private final UserRepository userRepository;
     private final EmailRepository emailRepository;
     private final PasswordEncoder passwordEncoder;
