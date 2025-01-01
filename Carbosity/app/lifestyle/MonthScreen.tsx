@@ -18,7 +18,7 @@ export default function EmissionsScreen() {
     useEffect(() => {
         navigation.setOptions({
             title: 'February',
-            headerStyle: { backgroundColor: THEME_COLORS.background }, // Set the header background color
+            headerStyle: { backgroundColor: THEME_COLORS.background },
             headerTintColor: THEME_COLORS.primary,
             
         });
